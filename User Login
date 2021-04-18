@@ -1,0 +1,240 @@
+
+package Model;
+
+import Dao.GeneralDao;
+import Domain.User;
+import java.util.List;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+
+@ManagedBean(name = "login")
+@SessionScoped
+public class LoginModel {
+    private List<User> userList;
+    private User user = new User();
+    private String uname;
+    private String pswd;
+
+    public LoginModel() {
+        userList = new GeneralDao().getUsers();
+    }
+
+    public String myLogin() {
+        user = null;
+        int n = 0;
+        for (User u : userList) {
+            if (u.getUsername().equals(uname)) {
+                n++;
+                this.user = u;
+            }
+        }
+        if (n == 0) {
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid UserName", null);
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+            return null;
+        } else {
+            if (user.getPassword().equals(pswd)) {
+                if (user.getUsertype().equalsIgnoreCase("admin")) {
+                    return "home";
+                } else if (user.getUsertype().equalsIgnoreCase("doctor")) {
+                    return "DoctorHome";
+                } else {
+                    return "login";
+                }
+            } else {
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid Password", null);
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+                return null;
+            }
+        }
+    }
+
+    public List<User> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getUname() {
+        return uname;
+    }
+
+    public void setUname(String uname) {
+        this.uname = uname;
+    }
+
+    public String getPswd() {
+        return pswd;
+    }
+
+    public void setPswd(String pswd) {
+        this.pswd = pswd;
+    }
+
+    
+}
+======================================================
+
+
+package Model;
+
+import Dao.GeneralDao;
+import Dao.GenericDao;
+import Domain.User;
+import java.util.List;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+@ManagedBean(name="user")
+@SessionScoped
+
+public class UserModel {
+    private User us = new User();
+    private List<User> uslist;
+   private int n;
+    public UserModel(){
+        uslist = new GeneralDao().getUsers();
+        n = uslist.size();
+    }
+    public void createUser(){
+        try {
+            new GenericDao<User>().Create(us);
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, us.getUsername()+" "+"Saved Successfully", null);
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+             uslist= new GeneralDao().getUsers();
+        } catch (Exception e) {
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,e.getMessage(), null);
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        }
+    }
+
+    public User getUs() {
+        return us;
+    }
+
+    public void setUs(User us) {
+        this.us = us;
+    }
+
+    public List<User> getUslist() {
+        return uslist;
+    }
+
+    public void setUslist(List<User> uslist) {
+        this.uslist = uslist;
+    }
+
+    public int getN() {
+        return n;
+    }
+
+    public void setN(int n) {
+        this.n = n;
+    }
+    
+    
+}
+=======================================
+
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>login</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="keywords" content="Augment Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
+              Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
+        <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+        <!-- Bootstrap Core CSS -->
+        <link href="css/bootstrap.min.css" rel='stylesheet' type='text/css' />
+        <!-- Custom CSS -->
+        <link href="css/style.css" rel='stylesheet' type='text/css' />
+        <!-- Graph CSS -->
+        <link href="css/font-awesome.css" rel="stylesheet"/> 
+        <!-- jQuery -->
+        <link href='//fonts.googleapis.com/css?family=Roboto:700,500,300,100italic,100,400' rel='stylesheet' type='text/css'/>
+        <!-- lined-icons -->
+        <link rel="stylesheet" href="css/icon-font.min.css" type='text/css' />
+        <!-- //lined-icons -->
+        <script src="js/jquery-1.10.2.min.js"></script>
+        <!--clock init-->
+    </h:head>
+    <h:body>
+        <div class="error_page">
+            <!--/login-top-->
+
+            <div class="error-top">
+                <h1 class="inner-tittle page">Welcome to Birth Registration System</h1>
+                <div class="login">
+                    <h3 class="inner-tittle t-inner">Login</h3>
+                    <div class="buttons login">
+                        <ul>
+                            <li><a href="#" class="hvr-sweep-to-right">Facebook</a></li>
+                            <li class="lost"><a href="#" class="hvr-sweep-to-left">Twitter</a> </li>
+                            <div class="clearfix"></div>
+                        </ul>
+                    </div>
+
+                    <h:form id="msgdisp">
+                        <p:messages showIcon="true" closable="true"/>
+                    </h:form>
+                    <h:form>
+                        <h:inputText class="text" value="#{login.uname}" requiredMessage="UserName is required!" required="true" onfocus="this.value = '';" onblur="if (this.value == '') {
+                                    this.value = 'Username';
+                                }" />
+                        <h:inputSecret value="#{login.pswd}" requiredMessage="Password is Required" required="true" onfocus="this.value = '';" onblur="if (this.value == '') {
+                                    this.value = 'Password';
+                                }"/>
+                        <div class="submit"><h:commandButton  class="btn btn-primary" value="Login" action="#{login.myLogin()}"/></div>
+                        <div class="clearfix"></div>
+
+                        <div class="new">
+                            <p><label class="checkbox11"><input type="checkbox" name="checkbox"/><i> </i>Forgot Password ?</label></p>
+                            <p class="sign">Do not have an account? <a href="SignUp.xhtml">Sign Up</a></p>
+                            <div class="clearfix"></div>
+                        </div>
+                    </h:form>
+                </div>
+
+
+            </div>
+
+
+            <!--//login-top-->
+        </div>
+
+        <!--//login-->
+        <!--footer section start-->
+        <div class="footer">
+            <div class="error-btn">
+                <a class="read fourth" href="home.xhtml">Return to Home</a>
+            </div>
+            <p>copyright 2017. All Rights Reserved | Design by Rusarwa Nahayo Robert</p>
+        </div>
+        <!--footer section end-->
+        <!--/404-->
+        <!--js -->
+        <script src="js/jquery.nicescroll.js"></script>
+        <script src="js/scripts.js"></script>
+        <!-- Bootstrap Core JavaScript -->
+        <script src="js/bootstrap.min.js"></script>
+    </h:body>
+</html>
+
+============
